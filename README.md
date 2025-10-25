@@ -80,15 +80,47 @@ python train.py --config configs/strong_config.json
 python train.py --config configs/boss_config.json
 ```
 
-### 4. Evaluate Models
+## 🏃‍♂️ How to Run Evaluation
 
+After training or downloading the models, you can run evaluation for each configuration as follows:
+
+**Simple Model:**
 ```bash
 python evaluate.py \
-    --model_path output/strong/final_model \
+    --model_path model_weights/output/simple/final_model \
+    --test_data data/test.json \
+    --config configs/simple_config.json \
+    --output_file simple_prediction/my_predictions.json
+```
+
+**Medium Model:**
+```bash
+python evaluate.py \
+    --model_path model_weights/output/medium/final_model \
+    --test_data data/test.json \
+    --config configs/medium_config.json \
+    --output_file medium_prediction/my_predictions.json
+```
+
+**Strong Model (Best):**
+```bash
+python evaluate.py \
+    --model_path model_weights/output/strong/final_model \
     --test_data data/test.json \
     --config configs/strong_config.json \
-    --output_file predictions.json
+    --output_file strong_prediction/my_predictions.json
 ```
+
+**Boss Model (Ensemble):**
+```bash
+python evaluate.py \
+    --model_path model_weights/output/boss/final_model \
+    --test_data data/test.json \
+    --config configs/boss_config.json \
+    --output_file boss_prediction/my_predictions.json
+```
+
+Each command will save predictions to the corresponding folder and print F1/EM scores for the test set.
 
 ## 📁 Project Structure
 
