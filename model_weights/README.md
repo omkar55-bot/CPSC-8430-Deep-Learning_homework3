@@ -24,9 +24,44 @@ This project trained 4 different configurations:
 
 ## How to Get the Models
 
-### Option 1: Train from Scratch (Recommended)
+You have three options:
 
-Follow the instructions in `HOW_TO_RUN.md` to train the models:
+### Option 1: Download from Google Drive (Recommended)
+
+Download the pre-trained models directly:
+
+1. Visit: https://drive.google.com/drive/folders/139j8--v2Tz6moCSEcdnipDVYlcsDXICy?usp=sharing
+
+2. Download the model folders:
+   - `simple_final_model/`
+   - `medium_final_model/`
+   - `strong_final_model/`
+   - `boss_final_model/`
+
+3. Extract and place them in the correct structure:
+   ```
+   model_weights/output/
+   ├── simple/
+   │   └── final_model/     ← Place simple_final_model contents here
+   ├── medium/
+   │   └── final_model/     ← Place medium_final_model contents here
+   ├── strong/
+   │   └── final_model/     ← Place strong_final_model contents here
+   └── boss/
+       └── final_model/     ← Place boss_final_model contents here
+   ```
+
+4. Verify the structure - each final_model folder should contain:
+   - `config.json`
+   - `model.safetensors` (or `pytorch_model.bin`)
+   - Tokenizer files (`tokenizer.json`, `vocab.txt`, etc.)
+   - For boss: `model_0/`, `model_1/`, `model_2/` subdirectories
+
+### Option 2: Train the Models Yourself
+
+See the main [HOW_TO_RUN.md](../HOW_TO_RUN.md) for training instructions.
+
+### Option 3: Use Hugging Face Hub (Alternative)
 
 ```bash
 # Setup environment

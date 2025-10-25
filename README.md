@@ -14,6 +14,18 @@ A transformer-based extractive Question Answering system for the Spoken-SQuAD da
 
 **Winner**: Strong configuration (ELECTRA-base with FP16 mixed precision)
 
+## 📥 Download Pre-trained Models
+
+**Google Drive Link**: [Download All Trained Models](https://drive.google.com/drive/folders/139j8--v2Tz6moCSEcdnipDVYlcsDXICy?usp=sharing)
+
+The trained model weights are too large for GitHub (100MB limit). Download them from Google Drive and place in `model_weights/output/` directory. See [model_weights/README.md](model_weights/README.md) for detailed instructions.
+
+Available models:
+- ✅ Simple (BERT-base, 46.04% F1) - ~400MB
+- ✅ Medium (BERT-base, 46.02% F1) - ~400MB  
+- ✅ Strong (ELECTRA-base, 53.80% F1) - ~388MB ⭐ BEST
+- ✅ Boss (Ensemble, 50.96% F1) - ~1.2GB
+
 ## 🎯 Project Overview
 
 This project implements an extractive Question Answering system using:

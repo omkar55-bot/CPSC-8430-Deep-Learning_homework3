@@ -3,6 +3,14 @@
                     Spoken-SQuAD QA Project
 ================================================================================
 
+📥 DOWNLOAD PRE-TRAINED MODELS
+https://drive.google.com/drive/folders/139j8--v2Tz6moCSEcdnipDVYlcsDXICy?usp=sharing
+
+Models available: Simple, Medium, Strong (best), Boss (ensemble)
+Place downloaded models in model_weights/output/ directory
+
+================================================================================
+
 PROJECT SUMMARY
 ================================================================================
 Task:        Extractive Question Answering on Spoken-SQuAD dataset
