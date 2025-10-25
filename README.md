@@ -26,6 +26,16 @@ Available models:
 - ✅ Strong (ELECTRA-base, 53.80% F1) - ~388MB ⭐ BEST
 - ✅ Boss (Ensemble, 50.96% F1) - ~1.2GB
 
+## 📂 Prediction Files Included
+
+All model prediction files for the test set are now included in the repository:
+- `simple_prediction/my_predictions.json`
+- `medium_prediction/my_predictions.json`
+- `strong_prediction/my_predictions.json`
+- `boss_prediction/my_predictions.json`
+
+Each contains predictions for 5,351 test questions. You can verify model performance without re-running evaluation.
+
 ## 🎯 Project Overview
 
 This project implements an extractive Question Answering system using:
