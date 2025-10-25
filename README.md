@@ -10,7 +10,7 @@ A transformer-based extractive Question Answering system for the Spoken-SQuAD da
 | Simple | 46.04%   | 32.20%      | ~45 min       |
 | Medium | 46.02%   | 32.03%      | ~1.5 hours    |
 | **Strong** | **53.80%** ⭐ | **38.70%** ⭐ | **~3 hours** |
-| Boss   | 50.96%   | 35.08%      | ~12 hours     |
+| Boss   | 50.96%   | 35.08%      | ~5 hours     |
 
 **Winner**: Strong configuration (ELECTRA-base with FP16 mixed precision)
 
