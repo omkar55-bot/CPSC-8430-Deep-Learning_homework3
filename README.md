@@ -205,12 +205,7 @@ CUDA 11.8+ (for GPU training)
 
 See `requirements.txt` for complete list.
 
-## 🎓 Course Information
 
-- **Course**: CPSC-8430 Deep Learning
-- **Assignment**: Homework 3 - Question Answering
-- **Dataset**: Spoken-SQuAD (Chinese)
-- **Task**: Extractive Question Answering
 
 ## 📖 References
 
@@ -219,15 +214,6 @@ See `requirements.txt` for complete list.
 - [ELECTRA Paper](https://arxiv.org/abs/2003.10555)
 - [Hugging Face Transformers](https://huggingface.co/docs/transformers)
 
-## ⚠️ Model Weights Not Included
-
-Due to GitHub's file size limitations (100MB max), trained model weights (~2.4GB total) are **not** included in this repository. 
-
-To use the models:
-1. Train from scratch using provided configs (recommended)
-2. Download pre-trained weights if available separately
-
-See `model_weights/README.md` for details.
 
 ## 📄 License
 
