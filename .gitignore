@@ -15,10 +15,7 @@ venv/
 data/
 *.json
 !configs/*.json
-
-# Predictions (can be regenerated)
-*_prediction/
-predictions/
+!*_prediction/*.json
 
 # Wandb logs (too large)
 wandb/
