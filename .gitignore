@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Data files (too large for GitHub)
+data/
+*.json
+!configs/*.json
+
+# Predictions (can be regenerated)
+*_prediction/
+predictions/
+
+# Wandb logs (too large)
+wandb/
+
+# Large files
+*.zip
+*.tar.gz
+*.rar
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Model weights (too large for GitHub - 388MB each)
+# Users should download separately or train models themselves
+model_weights/
+output/
+
+# But keep a README in model_weights directory
+!model_weights/README.md
+
+# OS
+.DS_Store
+Thumbs.db

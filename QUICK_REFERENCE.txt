@@ -1,0 +1,246 @@
+================================================================================
+                    QUICK REFERENCE GUIDE
+                    Spoken-SQuAD QA Project
+================================================================================
+
+PROJECT SUMMARY
+================================================================================
+Task:        Extractive Question Answering on Spoken-SQuAD dataset
+Language:    Chinese
+Models:      BERT-base-chinese, ELECTRA-base-chinese
+Framework:   PyTorch + Transformers + Accelerate
+Best Score:  53.80% F1, 38.70% EM (Strong configuration)
+
+
+DATASET
+================================================================================
+Format:      SQuAD v1.1 JSON format
+Train:       33,677 questions
+Dev:         3,434 questions  
+Test:        5,351 questions
+Source:      Spoken language (naturally noisier than written text)
+
+
+ENVIRONMENT SETUP
+================================================================================
+Create environment:
+  conda env create -f environment.yml
+  conda activate dlhw3
+
+Verify GPU:
+  python -c "import torch; print(torch.cuda.is_available())"
+
+Install packages:
+  pip install -r requirements.txt
+
+
+TRAINING COMMANDS
+================================================================================
+Simple:   bash run_training.sh configs/simple_config.json
+Medium:   bash run_training.sh configs/medium_config.json
+Strong:   bash run_training.sh configs/strong_config.json
+Boss:     bash run_training.sh configs/boss_config.json
+
+Or directly:
+  python train.py --config configs/simple_config.json
+
+
+EVALUATION COMMANDS
+================================================================================
+Simple:
+  python evaluate.py \
+    --model_path output/simple/final_model \
+    --test_data data/test.json \
+    --config configs/simple_config.json \
+    --output_file simple_prediction/my_predictions.json
+
+Medium:
+  python evaluate.py \
+    --model_path output/medium/final_model \
+    --test_data data/test.json \
+    --config configs/medium_config.json \
+    --output_file medium_prediction/my_predictions.json
+
+Strong:
+  python evaluate.py \
+    --model_path output/strong/final_model \
+    --test_data data/test.json \
+    --config configs/strong_config.json \
+    --output_file strong_prediction/my_predictions.json
+
+Boss:
+  python evaluate.py \
+    --model_path output/boss/final_model \
+    --test_data data/test.json \
+    --config configs/boss_config.json \
+    --output_file boss_prediction/my_predictions.json
+
+
+RESULTS AT A GLANCE
+================================================================================
+Simple:  46.04% F1, 32.20% EM  (~45 min training)
+Medium:  46.02% F1, 32.03% EM  (~1.5 hr training)
+Strong:  53.80% F1, 38.70% EM  (~3 hr training)  ⭐ BEST
+Boss:    50.96% F1, 35.08% EM  (~12 hr training)
+
+
+KEY IMPROVEMENTS IMPLEMENTED
+================================================================================
+✓ doc_stride = 150 (sliding window overlap)
+✓ Linear LR scheduler with warmup
+✓ Preprocessing: Answer centering in training windows
+✓ Postprocessing: Validate end_idx >= start_idx
+✓ FP16 mixed precision training
+✓ Gradient accumulation
+✓ Early stopping
+✓ Ensemble model support
+✓ Weights & Biases tracking
+
+
+IMPORTANT PARAMETERS
+================================================================================
+Max Length:         512 tokens
+Doc Stride:         150 tokens
+Max Answer Length:  30 tokens  (CRITICAL - was 100, caused issues)
+Top-K Candidates:   20
+
+
+FILE STRUCTURE
+================================================================================
+Core Files:
+  - train.py          Main training script
+  - evaluate.py       Evaluation and inference
+  - model.py          Model definitions
+  - dataset.py        Dataset loading and preprocessing
+  - utils.py          Metrics and postprocessing
+  - data_utils.py     Data utilities
+
+Configs:
+  - configs/simple_config.json
+  - configs/medium_config.json
+  - configs/strong_config.json
+  - configs/boss_config.json
+
+Setup:
+  - environment.yml
+  - requirements.txt
+  - setup_conda.sh
+
+Documentation:
+  - PROJECT_REPORT.txt        (Full detailed report)
+  - RESULTS_SUMMARY.txt       (Results and analysis)
+  - HOW_TO_RUN.md            (Running instructions)
+  - IMPROVEMENTS_GUIDE.md     (All improvements explained)
+
+
+COMMON ISSUES & SOLUTIONS
+================================================================================
+1. CUDA out of memory
+   → Reduce batch_size or enable gradient_accumulation
+
+2. "unscale_() has already been called"
+   → Fixed: Only clip gradients when sync_gradients=True
+
+3. Model loading error
+   → Use fallback loading with safetensors
+
+4. Very long predictions (100+ chars)
+   → Set max_answer_length=30, not 100
+
+5. end_idx < start_idx error
+   → Validate span in postprocessing
+
+
+HYPERPARAMETER COMPARISON
+================================================================================
+                    Simple    Medium    Strong    Boss
+Model:              BERT      BERT      ELECTRA   ELECTRA
+Epochs:             3         5         8         15
+Batch Size:         16        16        16        8
+Learning Rate:      3e-5      3e-5      3e-5      5e-6
+FP16:               No        No        Yes       Yes
+Grad Accum:         1         2         4         8
+Dropout:            0.1       0.1       0.2       0.3
+
+
+WHY STRONG WON
+================================================================================
+1. Better base model (ELECTRA > BERT)
+2. Mixed precision training (faster, more efficient)
+3. Well-balanced hyperparameters
+4. Not over-regularized like Boss
+
+Why Boss didn't win:
+- Models too similar (same architecture)
+- Over-regularized (dropout 0.3, low LR)
+- Averaging smoothed out confident predictions
+
+
+WANDB TRACKING
+================================================================================
+Project: spoken-squad
+URL: https://wandb.ai/omkarmayekar555-clemson-university/spoken-squad
+
+Tracked Metrics:
+  - Training loss
+  - Validation F1 and EM
+  - Learning rate
+  - Gradient norms
+
+
+NEXT STEPS FOR IMPROVEMENT
+================================================================================
+1. Try larger models (ELECTRA-large)
+2. Use diverse models in ensemble (BERT + ELECTRA + RoBERTa)
+3. Better ensemble hyperparameter tuning
+4. Data augmentation
+5. Implement beam search for answer extraction
+
+
+VALIDATION CHECKS
+================================================================================
+Before submitting:
+  ✓ All 4 models trained
+  ✓ All 4 models evaluated
+  ✓ Predictions saved in correct format
+  ✓ F1 and EM scores computed
+  ✓ No empty predictions (or minimal)
+  ✓ Answer lengths reasonable (not too long)
+  ✓ wandb logs available
+
+
+CONTACT & RESOURCES
+================================================================================
+Transformers Docs:  https://huggingface.co/docs/transformers
+PyTorch Docs:       https://pytorch.org/docs/
+Accelerate Docs:    https://huggingface.co/docs/accelerate
+SQuAD Paper:        https://arxiv.org/abs/1606.05250
+
+
+TIPS FOR REPORT WRITING
+================================================================================
+1. Explain preprocessing improvements (sliding windows, centering)
+2. Explain postprocessing fixes (validation, max_answer_length)
+3. Discuss why Strong beat Boss (important insight!)
+4. Include all hyperparameters
+5. Show training times and resource usage
+6. Discuss challenges faced and solutions
+7. Be honest about what didn't work
+8. Compare results to baseline
+
+
+FINAL CHECKLIST
+================================================================================
+[ ] Environment set up correctly
+[ ] Data downloaded and formatted
+[ ] All 4 models trained
+[ ] All 4 models evaluated
+[ ] Results documented
+[ ] Predictions saved
+[ ] Report written
+[ ] Code documented
+[ ] wandb logs available
+[ ] Ready to submit!
+
+
+================================================================================
