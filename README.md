@@ -1,217 +1,222 @@
-# Spoken-SQuAD Question Answering - HW3
+# CPSC-8430 Deep Learning - Homework 3
+## Spoken-SQuAD Question Answering System
 
-This project implements a BERT-based extractive question answering system for the Spoken-SQuAD dataset, which contains question-answer pairs derived from spoken audio with various noise levels.
+A transformer-based extractive Question Answering system for the Spoken-SQuAD dataset (Chinese).
 
-## 🎯 Task Overview
+## 📊 Results
 
-- **Task**: Extractive Question Answering (EQA) similar to SQuAD
-- **Dataset**: Spoken-SQuAD with 37,111 training and 5,351 testing question-answer pairs
-- **Challenge**: Handle long paragraphs with BERT's 512 token limit using sliding windows
-- **Goal**: Predict start and end positions of answer spans in the context
+| Model  | F1 Score | Exact Match | Training Time |
+|--------|----------|-------------|---------------|
+| Simple | 46.04%   | 32.20%      | ~45 min       |
+| Medium | 46.02%   | 32.03%      | ~1.5 hours    |
+| **Strong** | **53.80%** ⭐ | **38.70%** ⭐ | **~3 hours** |
+| Boss   | 50.96%   | 35.08%      | ~12 hours     |
 
-## 📊 Dataset Details
+**Winner**: Strong configuration (ELECTRA-base with FP16 mixed precision)
 
-- **Training Set**: 37,111 QA pairs (WER: 22.77%)
-- **Testing Set**: 5,351 QA pairs with noise variations:
-  - No noise: 22.73% WER
-  - Noise V1: 44.22% WER  
-  - Noise V2: 54.82% WER
+## 🎯 Project Overview
 
-## 🏗️ Project Structure
-
-```
-DLHW3/
-├── configs/                 # Configuration files for different levels
-│   ├── simple_config.json   # Basic configuration
-│   ├── medium_config.json   # With learning rate decay + doc_stride optimization
-│   ├── strong_config.json   # Better preprocessing + other models
-│   └── boss_config.json     # Ensemble + advanced postprocessing
-├── data/                    # Dataset directory
-│   ├── train.json          # Training data
-│   ├── dev.json            # Development data  
-│   └── test.json           # Test data
-├── output/                  # Model outputs and checkpoints
-├── logs/                    # Training logs
-├── evaluation_results/      # Evaluation outputs
-├── dataset.py              # Dataset loading and preprocessing
-├── model.py                # BERT-based QA model definitions
-├── train.py                # Training script
-├── evaluate.py             # Evaluation script
-├── utils.py                # Utility functions
-├── run_training.sh         # Training execution script
-├── run_evaluation.sh       # Evaluation execution script
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
-```
+This project implements an extractive Question Answering system using:
+- **Models**: BERT-base-chinese and ELECTRA-base-chinese
+- **Dataset**: Spoken-SQuAD (33,677 train, 3,434 dev, 5,351 test questions)
+- **Framework**: PyTorch + Transformers + Accelerate
+- **Techniques**: FP16 training, gradient accumulation, ensemble learning
 
 ## 🚀 Quick Start
 
-### 1. Setup Environment
+### 1. Environment Setup
 
 ```bash
-# Install dependencies
+# Create conda environment
+conda env create -f environment.yml
+conda activate dlhw3
+
+# Or use pip
 pip install -r requirements.txt
-
-# Make scripts executable
-chmod +x run_training.sh run_evaluation.sh
 ```
 
-### 2. Prepare Data
+### 2. Download Dataset
 
-Place your Spoken-SQuAD data files in the `data/` directory:
-- `train.json` - Training data
-- `dev.json` - Development/validation data  
-- `test.json` - Test data
-
-Expected JSON format:
-```json
-[
-  {
-    "id": "example_1",
-    "question": "What causes precipitation to fall?",
-    "context": "In meteorology, precipitation is any product...",
-    "answer_text": "gravity",
-    "answer_start": 45
-  }
-]
+Download Spoken-SQuAD dataset and place in `data/` directory:
+```
+data/
+├── train.json
+├── dev.json
+└── test.json
 ```
 
-### 3. Training
-
-Choose your difficulty level and run training:
+### 3. Train Models
 
 ```bash
-# Simple level (Sample code)
-./run_training.sh simple
+# Simple configuration (3 epochs, BERT)
+python train.py --config configs/simple_config.json
 
-# Medium level (Linear LR decay + doc_stride optimization) 
-./run_training.sh medium
+# Strong configuration (8 epochs, ELECTRA, FP16) - BEST
+python train.py --config configs/strong_config.json
 
-# Strong level (Better preprocessing + other pretrained models)
-./run_training.sh strong
-
-# Boss level (Ensemble + advanced postprocessing)
-./run_training.sh boss
+# Boss configuration (15 epochs, ensemble)
+python train.py --config configs/boss_config.json
 ```
 
-### 4. Evaluation
+### 4. Evaluate Models
 
 ```bash
-# Evaluate trained model
-./run_evaluation.sh output/best_model_epoch_3 data/test.json configs/simple_config.json
-
-# Interactive prediction mode
-python evaluate.py --model_path output/best_model_epoch_3 --config configs/simple_config.json --single_prediction
+python evaluate.py \
+    --model_path output/strong/final_model \
+    --test_data data/test.json \
+    --config configs/strong_config.json \
+    --output_file predictions.json
 ```
 
-## 📈 Performance Levels
+## 📁 Project Structure
 
-### 🟢 Simple Level
-- **Implementation**: Basic BERT fine-tuning with sliding windows
-- **Training Time**: ~7-40 minutes
-- **Features**:
-  - Standard BERT-base-chinese model
-  - Basic sliding window approach for long contexts
-  - Default hyperparameters
+```
+DLHW3/
+├── train.py                    # Training script
+├── evaluate.py                 # Evaluation and inference
+├── model.py                    # Model definitions
+├── dataset.py                  # Dataset loading and preprocessing
+├── utils.py                    # Metrics and postprocessing
+├── configs/                    # Configuration files
+│   ├── simple_config.json
+│   ├── medium_config.json
+│   ├── strong_config.json
+│   └── boss_config.json
+├── data/                       # Dataset (not included)
+├── model_weights/              # Trained models (not included - too large)
+├── PROJECT_REPORT.txt          # Detailed project report
+├── RESULTS_SUMMARY.txt         # Results analysis
+└── QUICK_REFERENCE.txt         # Quick reference guide
+```
 
-### 🟡 Medium Level  
-- **Improvements**: Linear learning rate decay + doc_stride optimization
-- **Training Time**: ~7-40 minutes
-- **Features**:
-  - Linear learning rate scheduling with warmup
-  - Optimized `doc_stride` parameter for better window overlap
-  - Gradient accumulation
+## 🔧 Key Features
 
-### 🟠 Strong Level
-- **Improvements**: Better preprocessing + alternative pretrained models
-- **Training Time**: ~20 minutes - 2 hours
-- **Features**:
-  - Advanced Chinese models (ELECTRA, RoBERTa-wwm)  
-  - Improved text preprocessing
-  - Enhanced sliding window strategy
-  - Mixed precision training (FP16)
-
-### 🔴 Boss Level
-- **Improvements**: Ensemble methods + advanced postprocessing
-- **Training Time**: ~2-12.5 hours
-- **Features**:
-  - Multi-model ensemble (ELECTRA + RoBERTa + BERT)
-  - Sophisticated answer postprocessing
-  - Advanced hyperparameter optimization
-  - Cross-validation techniques
-
-## 🛠️ Key Technical Features
-
-### Sliding Window Strategy
-- **Training**: Center windows around known answer positions
-- **Testing**: Generate overlapping windows with configurable stride
-- **Window Size**: Dynamically calculated based on question length
-
-### Model Architecture
-- **Base Models**: Any HuggingFace transformer (BERT, ELECTRA, RoBERTa)
-- **Task Head**: Linear layers for start/end position prediction
-- **Ensemble**: Weighted combination of multiple models (Boss level)
-
-### Advanced Preprocessing  
-- **Tokenization**: Proper handling of Chinese text
-- **Answer Alignment**: Robust character-to-token mapping
-- **Context Truncation**: Smart windowing preserving answer spans
+### Preprocessing Improvements
+- ✅ Sliding window approach with `doc_stride=150`
+- ✅ Answer centering in training windows
+- ✅ Proper handling of long contexts (>512 tokens)
+- ✅ SQuAD format data processing
 
 ### Training Optimizations
-- **Mixed Precision**: FP16 training for faster convergence
-- **Gradient Accumulation**: Handle larger effective batch sizes
-- **Learning Rate Scheduling**: Warmup + linear decay
-- **Early Stopping**: Prevent overfitting
+- ✅ Mixed precision training (FP16) with Accelerate
+- ✅ Gradient accumulation for larger effective batch sizes
+- ✅ Linear learning rate scheduling with warmup
+- ✅ Early stopping based on validation F1
+- ✅ Weights & Biases experiment tracking
 
-## 📊 Evaluation Metrics
+### Postprocessing Enhancements
+- ✅ Answer span validation (end_idx >= start_idx)
+- ✅ Tuned `max_answer_length=30` tokens
+- ✅ Multi-window answer selection
+- ✅ Top-K candidate evaluation
 
-- **F1 Score**: Token-level overlap between prediction and ground truth
-- **Exact Match**: Exact string match after normalization
-- **Word Error Rate (WER)**: For speech recognition quality assessment
+## 📝 Configurations
 
-## 🔧 Configuration
+### Simple (Baseline)
+- Model: BERT-base-chinese
+- Epochs: 3
+- Batch size: 16
+- Learning rate: 3e-5
+- FP16: No
 
-Each performance level has its own configuration file with optimized hyperparameters:
+### Medium (+ LR Scheduling)
+- Model: BERT-base-chinese
+- Epochs: 5
+- Gradient accumulation: 2
+- LR scheduler: Linear warmup + decay
 
-- **Learning Rate**: 5e-6 to 3e-5 depending on model and level
-- **Batch Size**: 8-16 with gradient accumulation  
-- **Doc Stride**: 16-128 tokens for window overlap
-- **Max Length**: 512 tokens (BERT limit)
-- **Epochs**: 3-15 depending on complexity
+### Strong (Best Performance) ⭐
+- Model: ELECTRA-base-chinese
+- Epochs: 8
+- FP16: Yes
+- Gradient accumulation: 4
+- Dropout: 0.2
 
-## 📝 Usage Tips
+### Boss (Ensemble)
+- Model: 3× ELECTRA-base-chinese
+- Epochs: 15 per model
+- Ensemble: Average predictions
+- Very high regularization
 
-### For Better Performance:
-1. **Data Quality**: Ensure proper text preprocessing and answer alignment
-2. **Model Selection**: Try different Chinese models from HuggingFace  
-3. **Hypertuning**: Adjust `doc_stride` and learning rate for your dataset
-4. **Ensemble**: Combine multiple models for Boss-level performance
-5. **Postprocessing**: Implement null answer detection and confidence scoring
+## 📊 Detailed Results
 
-### Common Issues:
-- **OOM Errors**: Reduce batch size or enable gradient accumulation
-- **Poor F1**: Check answer span alignment and preprocessing
-- **Slow Training**: Enable FP16 mixed precision training
-- **Long Contexts**: Optimize doc_stride parameter
+See `RESULTS_SUMMARY.txt` for comprehensive analysis including:
+- Performance breakdown by configuration
+- Hyperparameter comparison
+- Why Strong beat Boss ensemble
+- Preprocessing/postprocessing improvements
+- Challenges and solutions
 
-## 🎖️ Estimated Training Times
+## 🔍 Key Insights
 
-| Level | K80 | T4 | T4 (FP16) | P100 | V100 |
-|-------|-----|----|---------| -----|------|
-| Simple| 40m | 20m| 8m      | 10m  | 7m   |
-| Medium| 40m | 20m| 8m      | 10m  | 7m   |
-| Strong| 2h  | 1h | 25m     | 35m  | 20m  |
-| Boss  |12.5h| 6h | 2.5h    | 4.5h | 2h   |
+1. **Model Architecture Matters Most**: ELECTRA outperformed BERT by +7.76% F1
+2. **Strong Single Model Beat Ensemble**: Proper tuning > complexity
+3. **Preprocessing is Critical**: Sliding windows and answer centering improved results
+4. **Postprocessing Validation Essential**: Fixed invalid span predictions
+5. **FP16 Training**: Faster training without accuracy loss
 
-## 📚 References
+## 📚 Documentation
 
+- `PROJECT_REPORT.txt` - Complete project documentation
+- `RESULTS_SUMMARY.txt` - Results and performance analysis
+- `QUICK_REFERENCE.txt` - Commands and quick reference
+- `HOW_TO_RUN.md` - Detailed running instructions
+- `IMPROVEMENTS_GUIDE.md` - All improvements explained
+
+## 🐛 Issues Fixed
+
+1. ✅ Gradient clipping bug with FP16 training
+2. ✅ Model loading with safetensors format
+3. ✅ Ensemble model loading (3 separate models)
+4. ✅ max_answer_length tuning (100 → 30 tokens)
+5. ✅ Invalid answer span validation
+
+## 💡 Requirements
+
+```
+Python 3.9+
+PyTorch 2.0+
+Transformers 4.30+
+Accelerate 0.20+
+CUDA 11.8+ (for GPU training)
+```
+
+See `requirements.txt` for complete list.
+
+## 🎓 Course Information
+
+- **Course**: CPSC-8430 Deep Learning
+- **Assignment**: Homework 3 - Question Answering
+- **Dataset**: Spoken-SQuAD (Chinese)
+- **Task**: Extractive Question Answering
+
+## 📖 References
+
+- [SQuAD Paper](https://arxiv.org/abs/1606.05250)
 - [BERT Paper](https://arxiv.org/abs/1810.04805)
-- [Spoken-SQuAD Dataset](https://github.com/chiahsuan156/Spoken-SQuAD)
-- [HuggingFace Transformers](https://huggingface.co/transformers/)
-- [SQuAD Dataset](https://rajpurkar.github.io/SQuAD-explorer/)
+- [ELECTRA Paper](https://arxiv.org/abs/2003.10555)
+- [Hugging Face Transformers](https://huggingface.co/docs/transformers)
+
+## ⚠️ Model Weights Not Included
+
+Due to GitHub's file size limitations (100MB max), trained model weights (~2.4GB total) are **not** included in this repository. 
+
+To use the models:
+1. Train from scratch using provided configs (recommended)
+2. Download pre-trained weights if available separately
+
+See `model_weights/README.md` for details.
+
+## 📄 License
+
+This is a student project for educational purposes.
+
+## 🙏 Acknowledgments
+
+- Hugging Face for Transformers library
+- Spoken-SQuAD dataset creators
+- Course instructors and TAs
 
 ---
 
-**Good luck with your implementation! 🚀**
-
-For questions or issues, please check the training logs in the `logs/` directory or review the configuration files.
+**Best Performance**: Strong configuration achieved **53.80% F1** and **38.70% EM** on 5,351 test questions.
